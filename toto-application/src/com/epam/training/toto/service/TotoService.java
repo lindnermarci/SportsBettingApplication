@@ -194,19 +194,18 @@ public class TotoService {
 
     public void playGame() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter date: ");
+        System.out.print("Enter date: ");
         String dateString = scanner.nextLine().replace('.', '-');
         LocalDate date = LocalDate.parse(dateString.substring(0, dateString.length() - 1));
 
-        System.out.println("Enter outcomes: ");
+        System.out.print("Enter outcomes: ");
         char[] outcome = scanner.nextLine().toCharArray();
         scanner.close();
         if (outcome.length < 14) {
             System.out.println("Wrong length");
             return;
         }
-
-        System.out.println(date);
+        
         int ind = getRoundIndex(date);
         int charInd = 0;
         int hitCount = 0;
