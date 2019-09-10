@@ -8,6 +8,7 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import com.epam.training.toto.domain.Hit;
@@ -19,6 +20,7 @@ import com.epam.training.toto.domain.Round;
  */
 
 public class TotoService {
+    
 
     private static TotoService totoService;
 
@@ -93,15 +95,12 @@ public class TotoService {
     }
 
     public String getLargestPrize() {
-        int max = 0;
-        for (ArrayList<Hit> h : hits) {
-            // the largest prize in a given game must be the 14 hit
-            int prize = h.get(0).getPrize();
-            if (prize > max) {
-                max = prize;
-            }
+        Optional<Integer> max = hits.stream().map(hits -> hits.get(0).getPrize()).max(Integer::compare);
+        if(!max.isEmpty()) {
+            return "The largest prize ever recorded: " + formatCurrency(max.get());
         }
-        return "The largest prize ever recorded: " + formatCurrency(max);
+        return "There was no prize, ever";
+            
     }
 
     private static void initalise() {
@@ -128,10 +127,10 @@ public class TotoService {
     }
 
     private static Round getRoundOfLine(String[] values) {
-        return new Round(Integer.parseInt(values[0]), Integer.parseInt(values[1]), round(values), date(values));
+        return new Round(Integer.parseInt(values[0]), Integer.parseInt(values[1]), getRound(values), parseDate(values));
     }
 
-    private static LocalDate date(String[] values) {
+    private static LocalDate parseDate(String[] values) {
         if (values[3].length() > 1) {
             String date = values[3].replace('.', '-');
             return LocalDate.parse(date.substring(0, date.length() - 1));
@@ -141,7 +140,7 @@ public class TotoService {
 
     }
 
-    private static int round(String[] values) {
+    private static int getRound(String[] values) {
         return (values[2].equals("-")) ? 1 : Integer.parseInt(values[2]);
     }
 
@@ -183,30 +182,32 @@ public class TotoService {
             }
         }
 
-        // return _1count + "";
-        return format((float)_1count / total * 100, (float) _2count / total*100, (float) _Xcount / total*100);
+        return format((double)_1count / total * 100, (double) _2count / total*100, (double) _Xcount / total*100);
     }
 
-    private String format(double d, float e, float f) {
-        // TODO Auto-generated method stub
+    private String format(double d, double e, double f) {
         return String.format("Statistics: team #1 won: %.2f %%, team #2 won: %.2f %%, draw: %.2f %%", d, e, f);
     }
 
     public void playGame() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter date: ");
-        String dateString = scanner.nextLine().replace('.', '-');
-        LocalDate date = LocalDate.parse(dateString.substring(0, dateString.length() - 1));
-
-        System.out.print("Enter outcomes: ");
-        char[] outcome = scanner.nextLine().toCharArray();
+        LocalDate date = getDate(scanner);
+        char[] outcome = getOutcome(scanner);
         scanner.close();
-        if (outcome.length < 14) {
-            System.out.println("Wrong length");
+        if(date == null || outcome == null) {
+            System.out.println("Wrong format");
             return;
         }
         
         int ind = getRoundIndex(date);
+        
+        int hitCount = getHitCount(outcome, ind);
+
+        writeResult(ind, hitCount);
+
+    }
+
+    private int getHitCount(char[] outcome, int ind) {
         int charInd = 0;
         int hitCount = 0;
         for (Outcome x : outcomes.get(ind)) {
@@ -218,7 +219,32 @@ public class TotoService {
                 hitCount++;
             charInd++;
         }
+        return hitCount;
+    }
 
+    private char[] getOutcome(Scanner scanner) {
+        System.out.print("Enter outcomes: ");
+        char[] outcome = scanner.nextLine().toCharArray();
+        scanner.close();
+        if (outcome.length < 14) {
+            return null;
+        }
+        return outcome;
+    }
+
+    private LocalDate getDate(Scanner scanner) {
+        System.out.print("Enter date: ");
+        String dateString = scanner.nextLine();
+        if(dateString.matches("\\d{4}\\.\\d{2}\\.\\d{2}\\.")) {
+            dateString = dateString.replace('.', '-');
+            LocalDate date = LocalDate.parse(dateString.substring(0, dateString.length() - 1));
+            return date;
+        }
+        return null;
+
+    }
+
+    private void writeResult(int ind, int hitCount) {
         boolean winner = false;
         for (Hit hit : hits.get(ind)) {
             if (hit.getHitCount() == hitCount) {
@@ -229,7 +255,6 @@ public class TotoService {
         if(!winner) {
             System.out.println(formatResult(hitCount, 0));
         }
-
     }
 
     private int getRoundIndex(LocalDate date) {
