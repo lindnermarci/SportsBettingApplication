@@ -18,7 +18,7 @@ public class Hit {
 	public int getHitCount() {
 		return hitCount;
 	}
-	public int getNumOfWagers() {
+	public int getNumberOfWagers() {
 		return numOfWagers;
 	}
 	public int getPrize() {
