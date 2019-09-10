@@ -100,7 +100,7 @@ public class TotoService {
 				max = prize;
 			}
 		}
-		return formatCurrency(max);
+		return "The largest prize ever recorded: " + formatCurrency(max);
 	}
 
 
