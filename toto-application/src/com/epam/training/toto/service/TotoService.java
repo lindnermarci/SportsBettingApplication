@@ -219,10 +219,15 @@ public class TotoService {
             charInd++;
         }
 
+        boolean winner = false;
         for (Hit hit : hits.get(ind)) {
             if (hit.getHitCount() == hitCount) {
-                System.out.println(formatResult(hit.getHitCount(), hit.getPrize()));
+                winner = true;
+                System.out.println(formatResult(hitCount, hit.getPrize()));
             }
+        }
+        if(!winner) {
+            System.out.println(formatResult(hitCount, 0));
         }
 
     }
