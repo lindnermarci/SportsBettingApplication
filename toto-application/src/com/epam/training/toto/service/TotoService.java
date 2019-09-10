@@ -83,7 +83,12 @@ public class TotoService {
             outcomes.add(stringToOutcome(values[i]));
         }
 
-        outcomes.add(stringToOutcome(values[values.length - 1].substring(1)));
+        String last = values[values.length-1];
+        if(last.startsWith("+")) {
+            last = values[values.length-1].substring(1);   
+        }
+        outcomes.add(stringToOutcome(last));
+        
         return outcomes;
     }
 
@@ -166,23 +171,23 @@ public class TotoService {
 
         for (ArrayList<Outcome> list : outcomes) {
             for (Outcome outcome : list) {
-                if (outcome == Outcome._1)
-                    _1count++;
-                else if (outcome == Outcome._2)
+                if (outcome == Outcome._1) {
+                    _1count++; 
+                }
+                else if(outcome == Outcome.X) {
+                    _Xcount++;   
+                }
+                else if (outcome == Outcome._2) {
                     _2count++;
-                else
-                    _Xcount++;
+                }
             }
         }
 
-        return format(calculatePercent(_1count, total), calculatePercent(_2count, total), calculatePercent(_Xcount, total));
+        // return _1count + "";
+        return format((float)_1count / total * 100, (float) _2count / total*100, (float) _Xcount / total*100);
     }
 
-    private double calculatePercent(int _1count, int total) {
-        return (double) _1count / total * 100;
-    }
-
-    private String format(double d, double e, double f) {
+    private String format(double d, float e, float f) {
         // TODO Auto-generated method stub
         return String.format("Statistics: team #1 won: %.2f %%, team #2 won: %.2f %%, draw: %.2f %%", d, e, f);
     }
@@ -201,6 +206,7 @@ public class TotoService {
             return;
         }
 
+        System.out.println(date);
         int ind = getRoundIndex(date);
         int charInd = 0;
         int hitCount = 0;
