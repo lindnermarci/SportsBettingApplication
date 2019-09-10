@@ -3,7 +3,7 @@ package com.epam.training.toto.domain;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.epam.training.service.TotoService;
+import com.epam.training.toto.service.TotoService;
 
 /*
  * A class to represent the results of a round. (One line of the CSV)
