@@ -27,14 +27,10 @@ public class TotoService {
     private static final String COMMA_DELIMITER = ";";
 
     private List<Round> rounds;
-    private List<ArrayList<Hit>> hits;
-    private List<ArrayList<Outcome>> outcomes;
 
     private TotoService(List<Round> rounds, List<ArrayList<Hit>> hits,
             List<ArrayList<Outcome>> outcomes) {
         this.rounds = rounds;
-        this.hits = hits;
-        this.outcomes = outcomes;
     }
 
     public static TotoService getInstance() {
@@ -45,28 +41,14 @@ public class TotoService {
     }
 
     public List<Hit> getHits(Round round) {
-        return hits.get(getRoundIndex(round));
+        return round.getHits();
     }
 
-    public void setHits(Round round, List<Hit> hits2) {
-        int ind = getRoundIndex(round);
-        for (int i = 0; i < hits2.size(); ++i) {
-            hits.get(ind).set(i, hits2.get(i));
-        }
-
-    }
 
     public List<Outcome> getOutcome(Round round) {
-        return outcomes.get(getRoundIndex(round));
+        return round.getOutcomes();
     }
 
-    public void setOutcome(Round round, List<Outcome> outcomes2) {
-        int ind = getRoundIndex(round);
-        for (int i = 0; i < outcomes2.size(); ++i) {
-            outcomes.get(ind).set(i, outcomes2.get(i));
-        }
-
-    }
 
     public static ArrayList<Hit> getHitsOfLine(String[] values) {
         ArrayList<Hit> hits = new ArrayList<Hit>();
@@ -95,7 +77,10 @@ public class TotoService {
     }
 
     public String getLargestPrize() {
-        Optional<Integer> max = hits.stream().map(hits -> hits.get(0).getPrize()).max(Integer::compare);
+        
+        //Optional<Integer> max = rounds.stream().map(hits -> hits.get(0).getPrize()).max(Integer::compare);
+        
+        Optional<Integer> max = rounds.stream().map(round -> round.getHits()).map(hits -> hits.get(0).getPrize()).max(Integer::compare);
         if(!max.isEmpty()) {
             return "The largest prize ever recorded: " + formatCurrency(max.get());
         }
@@ -112,9 +97,7 @@ public class TotoService {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(COMMA_DELIMITER);
-                Round round = getRoundOfLine(values);
-                hits.add(getHitsOfLine(values));
-                outcomes.add(getOutcomesOfLine(values));
+                Round round = new Round(Integer.parseInt(values[0]), Integer.parseInt(values[1]), getRound(values), parseDate(values), getHitsOfLine(values), getOutcomesOfLine(values));
                 rounds.add(round);
             }
         } catch (FileNotFoundException e) {
@@ -126,9 +109,6 @@ public class TotoService {
         totoService = new TotoService(rounds, hits, outcomes);
     }
 
-    private static Round getRoundOfLine(String[] values) {
-        return new Round(Integer.parseInt(values[0]), Integer.parseInt(values[1]), getRound(values), parseDate(values));
-    }
 
     private static LocalDate parseDate(String[] values) {
         if (values[3].length() > 1) {
@@ -166,10 +146,10 @@ public class TotoService {
         int _1count = 0;
         int _2count = 0;
         int _Xcount = 0;
-        int total = outcomes.size() * outcomes.get(0).size();
+        int total = rounds.get(0).getOutcomes().size() * rounds.size();
 
-        for (ArrayList<Outcome> list : outcomes) {
-            for (Outcome outcome : list) {
+        for(Round round : rounds) {
+            for(Outcome outcome : round.getOutcomes()) {
                 if (outcome == Outcome._1) {
                     _1count++; 
                 }
@@ -181,18 +161,19 @@ public class TotoService {
                 }
             }
         }
+        
 
         return format((double)_1count / total * 100, (double) _2count / total*100, (double) _Xcount / total*100);
     }
-
+    
     private String format(double d, double e, double f) {
         return String.format("Statistics: team #1 won: %.2f %%, team #2 won: %.2f %%, draw: %.2f %%", d, e, f);
     }
 
     public void playGame() {
         Scanner scanner = new Scanner(System.in);
-        LocalDate date = getDate(scanner);
-        char[] outcome = getOutcome(scanner);
+        LocalDate date = getDateFromUser(scanner);
+        char[] outcome = getOutcomeFromUser(scanner);
         scanner.close();
         if(date == null || outcome == null) {
             System.out.println("Wrong format");
@@ -203,14 +184,14 @@ public class TotoService {
         
         int hitCount = getHitCount(outcome, ind);
 
-        writeResult(ind, hitCount);
+        writeResultOfWager(ind, hitCount);
 
     }
 
     private int getHitCount(char[] outcome, int ind) {
         int charInd = 0;
         int hitCount = 0;
-        for (Outcome x : outcomes.get(ind)) {
+        for (Outcome x : rounds.get(ind).getOutcomes()) {
             if (x == Outcome._1 && outcome[charInd] == '1')
                 hitCount++;
             else if (x == Outcome._2 && outcome[charInd] == '2')
@@ -222,7 +203,7 @@ public class TotoService {
         return hitCount;
     }
 
-    private char[] getOutcome(Scanner scanner) {
+    private char[] getOutcomeFromUser(Scanner scanner) {
         System.out.print("Enter outcomes: ");
         char[] outcome = scanner.nextLine().toCharArray();
         scanner.close();
@@ -232,7 +213,7 @@ public class TotoService {
         return outcome;
     }
 
-    private LocalDate getDate(Scanner scanner) {
+    private LocalDate getDateFromUser(Scanner scanner) {
         System.out.print("Enter date: ");
         String dateString = scanner.nextLine();
         if(dateString.matches("\\d{4}\\.\\d{2}\\.\\d{2}\\.")) {
@@ -244,9 +225,9 @@ public class TotoService {
 
     }
 
-    private void writeResult(int ind, int hitCount) {
+    private void writeResultOfWager(int ind, int hitCount) {
         boolean winner = false;
-        for (Hit hit : hits.get(ind)) {
+        for (Hit hit : rounds.get(ind).getHits()) {
             if (hit.getHitCount() == hitCount) {
                 winner = true;
                 System.out.println(formatResult(hitCount, hit.getPrize()));
@@ -261,9 +242,6 @@ public class TotoService {
         return rounds.indexOf(rounds.parallelStream().filter(round -> (round.getDate() != null) && round.getDate().equals(date)).findAny().get());
     }
 
-    private int getRoundIndex(Round round) {
-        return rounds.indexOf(rounds.parallelStream().filter(r -> (round != null) && round.equals(round)).findAny().get());
-    }
 
     private String formatResult(int hitCount, int prize) {
         return "Result: hits: " + hitCount + ", amount: " + formatCurrency(prize);

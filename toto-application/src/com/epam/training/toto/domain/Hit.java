@@ -5,31 +5,31 @@ package com.epam.training.toto.domain;
  */
 
 public class Hit {
-	private final int hitCount;
-	private final int numOfWagers;
-	private final int prize;
-	
-	public Hit(int hitCount, int numOfWagers, int prize) {
-		this.hitCount = hitCount;
-		this.numOfWagers = numOfWagers;
-		this.prize = prize;
-	}
-	
-	public int getHitCount() {
-		return hitCount;
-	}
-	public int getNumberOfWagers() {
-		return numOfWagers;
-	}
-	public int getPrize() {
-		return prize;
-	}
+    private final int hitCount;
+    private final int numOfWagers;
+    private final int prize;
 
-	@Override
-	public String toString() {
-		return "Hit [hitCount=" + hitCount + ", numOfWagers=" + numOfWagers + ", prize=" + prize + "]";
-	}
-	
-	
-	
+    public Hit(int hitCount, int numOfWagers, int prize) {
+        this.hitCount = hitCount;
+        this.numOfWagers = numOfWagers;
+        this.prize = prize;
+    }
+
+    public int getHitCount() {
+        return hitCount;
+    }
+
+    public int getNumberOfWagers() {
+        return numOfWagers;
+    }
+
+    public int getPrize() {
+        return prize;
+    }
+
+    @Override
+    public String toString() {
+        return "Hit [hitCount=" + hitCount + ", numOfWagers=" + numOfWagers + ", prize=" + prize + "]";
+    }
+
 }

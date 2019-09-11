@@ -17,13 +17,6 @@ public class App {
 
         ts.playGame();
 
-        /*
-         * for(Round r: ts.getRounds()) { System.out.println(r.toString()); }
-         * 
-         * for(List<Outcome> o: ts.getOutcomes()) { System.out.println(o); }
-         * 
-         * for(ArrayList<Hit> h: ts.getHits()) { System.out.println(h); }
-         */
     }
 
 }
