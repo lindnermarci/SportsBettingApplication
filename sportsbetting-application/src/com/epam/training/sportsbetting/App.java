@@ -54,6 +54,7 @@ public class App {
                     wagerAmount = view.readWagerAmount();
                 }while(!service.sufficientBalance(wagerAmount));
                 wager = new Wager(wagerAmount, outcomeOdd.get(), player);
+                service.saveWager(wager);
             }
             view.printWagerSaved(wager);
         }

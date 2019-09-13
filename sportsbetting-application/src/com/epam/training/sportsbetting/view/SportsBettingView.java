@@ -180,7 +180,7 @@ public class SportsBettingView implements View {
             sb = new StringBuilder();
         }
 
-        System.out.println("> Your balance is " + formatCurrency(player.getBalance().intValue(), player.getCurrency()) + '.');
+        System.out.println("> Your new balance is " + formatCurrency(player.getBalance().intValue(), player.getCurrency()) + '.');
     }
 
 }

@@ -69,7 +69,6 @@ public class SportsBetting implements SportsBettingSevice {
             System.out.printf("You don't have enough money, your balance is %d HUF", player.getBalance());
             return;
         }
-        System.out.println(wager.getSportEventTitle());
         wagers.add(wager);
         player.setBalance(player.getBalance().subtract(wager.getAmount()));
 
