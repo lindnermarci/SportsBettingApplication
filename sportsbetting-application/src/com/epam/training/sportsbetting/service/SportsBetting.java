@@ -81,16 +81,15 @@ public class SportsBetting implements SportsBettingSevice {
 
     @Override
     public void calculateResult() {
-        double random = Math.random();
+        int counter = 0;
             for(Wager wager: wagers) {
-                if(random < 0.5) {
+                if(counter % 2 == 0) {
                     Outcome outcome = wager.getOutcome();
                     SportEvent sportEvent = wager.getSportEvent();
                     sportEvent.addWinnerOutcome(outcome);
                     wager.setWin(true);
                     wager.increasePlayerBalanace(wager.getAmount().multiply(wager.getOutcomeOdd()));
                 }
-                random = Math.random();
                 wager.setProcessed(true);
             }
     }
