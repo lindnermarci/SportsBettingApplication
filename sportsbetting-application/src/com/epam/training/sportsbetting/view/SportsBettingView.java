@@ -19,6 +19,7 @@ import com.epam.training.sportsbetting.domain.Wager;
 public class SportsBettingView implements View {
 
     private Scanner scanner = new Scanner(System.in);
+    static boolean correctGrammar = false;
 
     @Override
     public Player readPlayerData() {
@@ -58,7 +59,8 @@ public class SportsBettingView implements View {
 
     @Override
     public void PrintOutcomeOdds(List<SportEvent> sportEvents) {
-        System.out.println("> What are you want to bet on? (choose a number or press q for quit)");
+        System.out.println("> What " + (correctGrammar ? "do" : "are") + " you want to bet on? (choose a number or press q for quit)");
+        correctGrammar = true;
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (SportEvent event : sportEvents) {
@@ -67,9 +69,9 @@ public class SportsBettingView implements View {
                     for (OutcomeOdd outcomeOdd : outcome.getOutcomeOdds()) {
                         sb.append("> ")
                                 .append(i)
-                                .append(": sport event: ")
+                                .append(": Sport event: ")
                                 .append(event.getTitle())
-                                .append(" (")
+                                .append(" (start: ")
                                 .append(event.getStringStartDate())
                                 .append("), Bet: ")
                                 .append(bet.getDescription())
@@ -153,14 +155,14 @@ public class SportsBettingView implements View {
 
     @Override
     public void printNotEnoughBalance(Player player) {
-        System.out.printf("You don't have enough money, your balance is %s", formatCurrency(player.getBalance().intValue(), player.getCurrency()));
+        System.out.printf("> You don't have enough money, your balance is %s", formatCurrency(player.getBalance().intValue(), player.getCurrency()));
         System.out.println();
 
     }
 
     @Override
     public void printResult(Player player, List<Wager> wagers) {
-        System.out.println("> Result:");
+        System.out.println("> Results:");
         StringBuilder sb = new StringBuilder();
         for (Wager wager : wagers) {
             sb.append("> Wager \'")
