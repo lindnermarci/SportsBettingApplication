@@ -89,6 +89,7 @@ public class SportsBetting implements SportsBettingSevice {
                     sportEvent.addWinnerOutcome(outcome);
                     wager.setWin(true);
                     wager.increasePlayerBalanace(wager.getAmount().multiply(wager.getOutcomeOdd()));
+                    counter++;
                 }
                 wager.setProcessed(true);
             }
