@@ -28,8 +28,7 @@ public class TotoService {
 
     private List<Round> rounds;
 
-    private TotoService(List<Round> rounds, List<ArrayList<Hit>> hits,
-            List<ArrayList<Outcome>> outcomes) {
+    private TotoService(List<Round> rounds) {
         this.rounds = rounds;
     }
 
@@ -77,9 +76,6 @@ public class TotoService {
     }
 
     public String getLargestPrize() {
-        
-        //Optional<Integer> max = rounds.stream().map(hits -> hits.get(0).getPrize()).max(Integer::compare);
-        
         Optional<Integer> max = rounds.stream().map(round -> round.getHits()).map(hits -> hits.get(0).getPrize()).max(Integer::compare);
         if(!max.isEmpty()) {
             return "The largest prize ever recorded: " + formatCurrency(max.get());
@@ -90,9 +86,7 @@ public class TotoService {
 
     private static void initalise() {
         ArrayList<Round> rounds = new ArrayList<Round>();
-        ArrayList<ArrayList<Hit>> hits = new ArrayList<ArrayList<Hit>>();
-        ArrayList<ArrayList<Outcome>> outcomes = new ArrayList<ArrayList<Outcome>>();
-
+        
         try (BufferedReader br = new BufferedReader(new FileReader("toto.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -106,7 +100,7 @@ public class TotoService {
             e.printStackTrace();
         }
 
-        totoService = new TotoService(rounds, hits, outcomes);
+        totoService = new TotoService(rounds);
     }
 
 
@@ -136,9 +130,7 @@ public class TotoService {
 
     private String formatCurrency(int value) {
         String pattern = "###,###.###";
-
         DecimalFormat decimalFormat = new DecimalFormat(pattern);
-
         return decimalFormat.format(value) + " Ft";
     }
 
