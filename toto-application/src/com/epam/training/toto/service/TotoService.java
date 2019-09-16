@@ -80,7 +80,7 @@ public class TotoService {
         if(!max.isEmpty()) {
             return "The largest prize ever recorded: " + formatCurrency(max.get());
         }
-        return "There was no prize, ever";
+        return new String();
             
     }
 
@@ -109,7 +109,15 @@ public class TotoService {
             String date = values[3].replace('.', '-');
             return LocalDate.parse(date.substring(0, date.length() - 1));
         } else {
-            return null;
+            int year = 0, week = 0, round = 0;
+            try {
+                year = Integer.parseInt(values[0]);
+                week = Integer.parseInt(values[1]);
+                round = Integer.parseInt(values[2]);
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+            return LocalDate.ofYearDay(year, week * 7).plusDays(round);
         }
 
     }
